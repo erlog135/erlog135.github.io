@@ -1,0 +1,16 @@
+a&d for left and right.
+space bar for jump.
+left click a block to break it.
+right click a block to place it under you.
+(Some blocks can not be placed or broken.)
+tab for hotbar (does nothing yet.)
+S to save current game.
+enter to load saved game.
+r to reset world.
+escape to quit game.
+f11 for fullscreen.
+p for rain.
+o for snow.
+num 2 for beach area.
+
+
