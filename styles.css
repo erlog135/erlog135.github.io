@@ -1,5 +1,7 @@
 .card-img-overlay{
-    background: linear-gradient(rgba(0, 0, 0,0.9), rgba(0, 0, 0, 0.5));
+    background-color: #0009;
+    transition: 0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    transition-property: border-radius, background-color,text-shadow;
 }
 
 .card-img{
@@ -7,5 +9,54 @@
     height: 300px;
     object-fit: cover;
     filter: blur(0px);
+    transition: border-radius 0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    
 }
 
+.card{
+    transition:  0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    transition-property: transform, border-radius;
+}
+
+.card:hover{
+    transform: scale(1.05);
+    border-radius: 20px;
+}
+
+.card .card-img-overlay h1{
+    transition:  0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    transition-property: text-shadow;
+}
+
+.card .card-img-overlay p{
+    transition:  0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    transition-property: text-shadow;
+}
+
+.card:hover .card-img-overlay{
+    border-radius: 16px;
+    background-color: #0000;
+    
+}
+
+.card:hover .card-img-overlay h1{
+    text-shadow: 0px 2px 4px black;
+}
+
+.card:hover .card-img-overlay p{
+    text-shadow: 0px 2px 4px black;
+}
+
+.card:hover .card-img{
+    border-radius: 16px;
+}
+
+body{
+    background: linear-gradient(to bottom right,#001E2F,#37003A,#1F1C00);
+}
+
+.bg-nav{
+    background: linear-gradient(to bottom right,#001E2F88,#37003A88,#1F1C0088);
+    backdrop-filter: blur(4px);
+    box-shadow: 0px 0px 2px #0008;
+}
