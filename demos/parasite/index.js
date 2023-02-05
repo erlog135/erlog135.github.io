@@ -18,6 +18,9 @@ let imageEncodeForm = document.getElementById("image-encode-form");
 let outputForm = document.getElementById("output-form");
 let outputButton = document.getElementById("output-button");
 
+let downloadForm = document.getElementById("download-form");
+let downloadButton = document.getElementById("download-button");
+
 baseImageUpload.addEventListener("change", (e) => {
 
 
@@ -96,13 +99,21 @@ decodeRadio.addEventListener("change", (e) => {
 
 outputButton.addEventListener("click",(e)=>{
 
-    outputCanvas.hidden = false;
+    downloadForm.hidden = false;
 
     if(outputButton.innerText == "Encode"){
         encode();
     }else{
         decode();
     }
+})
+
+downloadButton.addEventListener("click",(e)=>{
+    let image = outputCanvas.toDataURL("image/png", 1.0).replace("image/png", "image/octet-stream");
+    let link = document.createElement('a');
+    link.download = "ps-output.png";
+    link.href = image;
+    link.click();
 })
 
 function showBaseCanvas() {
