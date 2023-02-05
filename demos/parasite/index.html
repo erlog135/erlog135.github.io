@@ -1,18 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYBAMAAAASWSDLAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAASUExURf///wAAADAwMP//AACU//8A3JRWGCQAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABPSURBVCjPY0ABjIJwIIDGEVKCAkUMjrIRBGJycOoRcXFxcVINDQ0NROcAlak4qQbB9SBxVCDKgrBwnEAGq2LjuIaCABYOTrfhDAMEYGAAACdII/8+qieAAAAAAElFTkSuQmCC" />
-    <title>Solid App</title>
-    <script type="module" crossorigin src="/assets/index-6ee78243.js"></script>
-    <link rel="stylesheet" href="/assets/index-d28923cb.css">
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
 
-    
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParaSite</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+</head>
+
+<body>
+
+    <header>
+        <img src="favicon.png"/>
+        <p>ParaSite v1</p>
+    </header>
+
+    <hr />
+
+    <label for="image-base-upload">Base image</label><br />
+    <input id="image-base-upload" type="file" accept="image/*" /><br />
+
+    <hr />
+
+    <div id="encoding-type-form" hidden>
+
+        <label for="encode-text">Encode text</label>
+        <input id="encode-text" type="radio" name="encoding" /><br />
+
+        <div id="text-encode-form" hidden>
+            <label for="text-to-encode">Text to encode:</label>
+            <input id="text-to-encode" type="text" /><br />
+        </div>
+
+        <label for="encode-image">Encode image</label>
+        <input id="encode-image" type="radio" name="encoding" /><br />
+
+        <div id="image-encode-form" hidden>
+            <label for="image-to-encode-upload">Image to encode:</label>
+            <input id="image-to-encode-upload" type="file" accept="image/*" /><br />
+        </div>
+
+        <label for="decode-image">Decode</label>
+        <input id="decode-image" type="radio" name="encoding" /><br />
+
+        <hr />
+    </div>
+
+    <canvas id="base-canvas" hidden></canvas>
+
+
+    <canvas id="overlay-canvas" hidden></canvas>
+
+    <br />
+
+    <div id="output-form" hidden>
+        <hr />
+        <button id="output-button">Encode</button><br />
+        <hr />
+    </div>
+
+    <canvas id="output-canvas" hidden></canvas>
+
+    <script src="index.js"></script>
+</body>
+
 </html>
