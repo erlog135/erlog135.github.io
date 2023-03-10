@@ -1,7 +1,24 @@
+@font-face {
+    font-family: brashV1;
+    src: url(Brash.ttf);
+}
+
 
 body{
     background-color: #001E2F;
     background: linear-gradient(to bottom right,#001e2f,#37003A,#1f1c00);
+}
+
+.brash{
+    font-family: brashV1,'Courier New', Courier, monospace;
+}
+
+.brash.navbar-brand{
+    padding: 0px;
+    padding-top: 5px;
+    margin: 0px;
+    font-size: 48px;
+    line-height: 48px;
 }
 
 .outline-special{

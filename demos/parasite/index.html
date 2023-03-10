@@ -14,7 +14,7 @@
 
     <header>
         <img src="favicon.png"/>
-        <p>ParaSite v1</p>
+        <p>ParaSite v1.1</p>
     </header>
 
     <hr />
@@ -57,7 +57,27 @@
 
     <div id="output-form" hidden>
         <hr />
-        <button id="output-button">Encode</button><br />
+
+        <label for="output-maxr">Output maximum resolution</label>
+        <input id="output-maxr" type="radio" name="output-quality" /><br />
+
+        <label for="output-comp">Output compressable</label>
+        <input id="output-comp" type="radio" name="output-quality" /><br />
+
+        <label for="output-custom">Output custom</label>
+        <input id="output-custom" type="radio" name="output-quality" /><br />
+
+        <div id="output-slider-form" hidden>
+            <label for="output-slider">Quality reduction:</label>
+            <input type="range" min="1" max="10" value="1" class="slider" id="output-slider"><br />
+        </div>
+
+        <p>Quality reduction: 
+            <b><span id="output-quality-reduction">5</span></b>
+        </p>
+
+        <button id="output-button" hidden>Encode</button><br />
+
         <hr />
     </div>
 

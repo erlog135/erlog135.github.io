@@ -18,8 +18,20 @@ let imageEncodeForm = document.getElementById("image-encode-form");
 let outputForm = document.getElementById("output-form");
 let outputButton = document.getElementById("output-button");
 
+let maxROutputRadio = document.getElementById("output-maxr");
+let compOutputRadio = document.getElementById("output-comp");
+let customOutputRadio = document.getElementById("output-custom");
+
+let outputSlider = document.getElementById("output-slider");
+
+let outputSliderForm = document.getElementById("output-slider-form");
 let downloadForm = document.getElementById("download-form");
 let downloadButton = document.getElementById("download-button");
+
+let outputQualityReduction = document.getElementById("output-quality-reduction");
+
+let baseImage;
+let overlayImage;
 
 baseImageUpload.addEventListener("change", (e) => {
 
@@ -97,6 +109,61 @@ decodeRadio.addEventListener("change", (e) => {
     }
 });
 
+maxROutputRadio.addEventListener("change", (e) => {
+    if(e.target.checked){
+
+        outputSliderForm.hidden = true;
+        
+        outputButton.hidden = false;
+    }
+});
+
+maxROutputRadio.addEventListener("change", (e) => {
+    if(e.target.checked){
+        
+        outputSliderForm.hidden = true;
+        
+        outputQualityReduction.innerText = "1";
+        
+        outputButton.hidden = false;
+
+        resizeOverlay();
+    }
+});
+
+compOutputRadio.addEventListener("change", (e) => {
+    if(e.target.checked){
+
+        outputSliderForm.hidden = true;
+
+        outputQualityReduction.innerText = "5";
+        
+        outputButton.hidden = false;
+
+        resizeOverlay();
+    }
+});
+
+
+customOutputRadio.addEventListener("change", (e) => {
+    if(e.target.checked){
+
+        outputSliderForm.hidden = false;
+
+        outputQualityReduction.innerText = "1";
+        
+        outputButton.hidden = false;
+
+        resizeOverlay();
+    }
+});
+
+outputSlider.addEventListener("change",(e)=>{
+    outputQualityReduction.innerText = e.target.value;
+
+    resizeOverlay();
+});
+
 outputButton.addEventListener("click",(e)=>{
 
     downloadForm.hidden = false;
@@ -118,6 +185,8 @@ downloadButton.addEventListener("click",(e)=>{
 
 function showBaseCanvas() {
 
+    baseImage = this;
+
     canvas.width = this.width;
     canvas.height = this.height;
 
@@ -126,6 +195,8 @@ function showBaseCanvas() {
 }
 
 function imageOverlayCanvas() {
+
+    overlayImage = this;
 
     overlayCanvas.width = canvas.width;
     overlayCanvas.height = canvas.height;
@@ -150,6 +221,9 @@ function textOverlayCanvas(text) {
 }
 
 function encode() {
+
+    let qr = Number(outputQualityReduction.innerText)*10;
+
     outputCanvas.width = canvas.width;
     outputCanvas.height = canvas.height;
 
@@ -165,13 +239,15 @@ function encode() {
         const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
         const oPixel = [overlayData.data[i], overlayData.data[i + 1], overlayData.data[i + 2], overlayData.data[i + 3]];
 
-        outputData.data[i] = Math.min(pixel[0] - pixel[0] % 10, 240) + Math.floor(oPixel[0] / (25.6));
+        outputData.data[i] = Math.min(pixel[0] - pixel[0] % qr, 250 - 250 % qr) + Math.floor(oPixel[0] / (25.6))*(qr/10);
 
-        outputData.data[i + 1] = Math.min(pixel[1] - pixel[1] % 10, 240) + Math.floor(oPixel[1] / (25.6));
+        outputData.data[i + 1] = Math.min(pixel[1] - pixel[1] % qr, 250 - 250 % qr) + Math.floor(oPixel[1] / (25.6))*(qr/10);
 
-        outputData.data[i + 2] = Math.min(pixel[2] - pixel[2] % 10, 240) + Math.floor(oPixel[2] / (25.6));
+        outputData.data[i + 2] = Math.min(pixel[2] - pixel[2] % qr, 250 - 250 % qr) + Math.floor(oPixel[2] / (25.6))*(qr/10);
 
         outputData.data[i + 3] = pixel[3];
+
+        
 
     }
 
@@ -180,6 +256,8 @@ function encode() {
 }
 
 function decode() {
+
+    let qr = Number(outputQualityReduction.innerText)*10;
 
     outputCanvas.width = canvas.width;
     outputCanvas.height = canvas.height;
@@ -194,15 +272,33 @@ function decode() {
 
         const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
 
-        outputData.data[i] = Math.floor((pixel[0] % 10) * (10 / 9) * (25.6));
+        outputData.data[i] = Math.floor((pixel[0] % qr) * (10/9) * (256/qr));
 
-        outputData.data[i + 1] = Math.floor((pixel[1] % 10) * (10 / 9) * (25.6));
+        outputData.data[i + 1] = Math.floor((pixel[1] % qr) * (10/9) * (256/qr));
 
-        outputData.data[i + 2] = Math.floor((pixel[2] % 10) * (10 / 9) * (25.6));
+        outputData.data[i + 2] = Math.floor((pixel[2] % qr) * (10/9) * (256/qr));
 
         outputData.data[i + 3] = pixel[3];
 
     }
 
     opctx.putImageData(outputData, 0, 0);
+}
+
+function resizeOverlay(){
+        if(outputButton.innerText == "Encode"){
+        let qualityReduction = Number(outputQualityReduction.innerText);
+
+        let reWidth = canvas.width/qualityReduction;
+        let reHeight = canvas.height/qualityReduction;
+
+        octx = overlayCanvas.getContext("2d");
+
+        octx.webkitImageSmoothingEnabled = false;
+        octx.mozImageSmoothingEnabled = false;
+        octx.imageSmoothingEnabled = false;
+
+        octx.drawImage(overlayImage,0,0,reWidth,reHeight);
+        octx.drawImage(overlayCanvas,0,0,reWidth,reHeight,0,0,canvas.width,canvas.height);
+    }
 }
