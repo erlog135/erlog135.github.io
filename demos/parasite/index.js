@@ -32,6 +32,7 @@ let outputQualityReduction = document.getElementById("output-quality-reduction")
 
 let baseImage;
 let overlayImage;
+let qrStrength = 16;
 
 baseImageUpload.addEventListener("change", (e) => {
 
@@ -64,12 +65,12 @@ textWrite.addEventListener("change", (e) => {
     textOverlayCanvas(e.target.value);
 })
 
-textWrite.addEventListener("submit", (e)=>{
+textWrite.addEventListener("submit", (e) => {
     e.preventDefault();
 })
 
 textRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
+    if (e.target.checked) {
 
         textEncodeForm.hidden = false;
         imageEncodeForm.hidden = true;
@@ -82,13 +83,13 @@ textRadio.addEventListener("change", (e) => {
 });
 
 imageRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
-        
+    if (e.target.checked) {
+
         textEncodeForm.hidden = true;
         imageEncodeForm.hidden = false;
 
         overlayCanvas.hidden = false;
-        
+
         outputForm.hidden = false;
         outputButton.innerText = "Encode";
     }
@@ -96,35 +97,35 @@ imageRadio.addEventListener("change", (e) => {
 
 
 decodeRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
+    if (e.target.checked) {
 
-        
+
         textEncodeForm.hidden = true;
         imageEncodeForm.hidden = true;
 
         overlayCanvas.hidden = true;
-        
+
         outputForm.hidden = false;
         outputButton.innerText = "Decode";
     }
 });
 
 maxROutputRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
+    if (e.target.checked) {
 
         outputSliderForm.hidden = true;
-        
+
         outputButton.hidden = false;
     }
 });
 
 maxROutputRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
-        
+    if (e.target.checked) {
+
         outputSliderForm.hidden = true;
-        
+
         outputQualityReduction.innerText = "1";
-        
+
         outputButton.hidden = false;
 
         resizeOverlay();
@@ -132,12 +133,12 @@ maxROutputRadio.addEventListener("change", (e) => {
 });
 
 compOutputRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
+    if (e.target.checked) {
 
         outputSliderForm.hidden = true;
 
-        outputQualityReduction.innerText = "5";
-        
+        outputQualityReduction.innerText = "4";
+
         outputButton.hidden = false;
 
         resizeOverlay();
@@ -146,36 +147,36 @@ compOutputRadio.addEventListener("change", (e) => {
 
 
 customOutputRadio.addEventListener("change", (e) => {
-    if(e.target.checked){
+    if (e.target.checked) {
 
         outputSliderForm.hidden = false;
 
-        outputQualityReduction.innerText = "1";
-        
+        outputQualityReduction.innerText = outputSlider.value;
+
         outputButton.hidden = false;
 
         resizeOverlay();
     }
 });
 
-outputSlider.addEventListener("change",(e)=>{
+outputSlider.addEventListener("change", (e) => {
     outputQualityReduction.innerText = e.target.value;
 
     resizeOverlay();
 });
 
-outputButton.addEventListener("click",(e)=>{
+outputButton.addEventListener("click", (e) => {
 
     downloadForm.hidden = false;
 
-    if(outputButton.innerText == "Encode"){
+    if (outputButton.innerText == "Encode") {
         encode();
-    }else{
+    } else {
         decode();
     }
 })
 
-downloadButton.addEventListener("click",(e)=>{
+downloadButton.addEventListener("click", (e) => {
     let image = outputCanvas.toDataURL("image/png", 1.0).replace("image/png", "image/octet-stream");
     let link = document.createElement('a');
     link.download = "ps-output.png";
@@ -222,7 +223,9 @@ function textOverlayCanvas(text) {
 
 function encode() {
 
-    let qr = Number(outputQualityReduction.innerText)*10;
+    //from 1 to 8
+
+    let qr = Number(outputQualityReduction.innerText) * qrStrength;
 
     outputCanvas.width = canvas.width;
     outputCanvas.height = canvas.height;
@@ -239,16 +242,22 @@ function encode() {
         const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
         const oPixel = [overlayData.data[i], overlayData.data[i + 1], overlayData.data[i + 2], overlayData.data[i + 3]];
 
-        outputData.data[i] = Math.min(pixel[0] - pixel[0] % qr, 250 - 250 % qr) + Math.floor(oPixel[0] / (25.6))*(qr/10);
+        for (let color = 0; color < pixel.length; color++) {
+            if (color < 3) {
+                //round base pixels down to a multiple of qr
+                let base = Math.floor(pixel[color] / qr) * qr;
 
-        outputData.data[i + 1] = Math.min(pixel[1] - pixel[1] % qr, 250 - 250 % qr) + Math.floor(oPixel[1] / (25.6))*(qr/10);
+                //round overlay pixels to 16 color values for r,g,b
+                let overlay = (Math.floor(oPixel[color] / qrStrength)) * Number(outputQualityReduction.innerText);
 
-        outputData.data[i + 2] = Math.min(pixel[2] - pixel[2] % qr, 250 - 250 % qr) + Math.floor(oPixel[2] / (25.6))*(qr/10);
+                //in the output, append the overlay to the base
+                outputData.data[i + color] = Math.min(base + overlay, 255);
+            } else {
 
-        outputData.data[i + 3] = pixel[3];
-
-        
-
+                //do nothing to the alpha channel
+                outputData.data[i + color] = pixel[color];
+            }
+        }
     }
 
     opctx.putImageData(outputData, 0, 0);
@@ -257,7 +266,7 @@ function encode() {
 
 function decode() {
 
-    let qr = Number(outputQualityReduction.innerText)*10;
+    let qr = Number(outputQualityReduction.innerText) * qrStrength;
 
     outputCanvas.width = canvas.width;
     outputCanvas.height = canvas.height;
@@ -272,25 +281,31 @@ function decode() {
 
         const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
 
-        outputData.data[i] = Math.floor((pixel[0] % qr) * (10/9) * (256/qr));
+        for (let color = 0; color < pixel.length; color++) {
+            if (color < 3) {
+                //get the 16  r,g,b, from the base and ensure max is qrStrength to make them fit range
+                let output = Math.floor(((pixel[color] % qr))/Number(outputQualityReduction.innerText)) * qrStrength;
 
-        outputData.data[i + 1] = Math.floor((pixel[1] % qr) * (10/9) * (256/qr));
+                //in the output, append the overlay to the base
+                outputData.data[i + color] = Math.min(output, 255);
+            } else {
 
-        outputData.data[i + 2] = Math.floor((pixel[2] % qr) * (10/9) * (256/qr));
-
-        outputData.data[i + 3] = pixel[3];
+                //do nothing to the alpha channel
+                outputData.data[i + color] = pixel[color];
+            }
+        }
 
     }
 
     opctx.putImageData(outputData, 0, 0);
 }
 
-function resizeOverlay(){
-        if(outputButton.innerText == "Encode"){
+function resizeOverlay() {
+    if (outputButton.innerText == "Encode") {
         let qualityReduction = Number(outputQualityReduction.innerText);
 
-        let reWidth = canvas.width/qualityReduction;
-        let reHeight = canvas.height/qualityReduction;
+        let reWidth = canvas.width / qualityReduction;
+        let reHeight = canvas.height / qualityReduction;
 
         octx = overlayCanvas.getContext("2d");
 
@@ -298,7 +313,11 @@ function resizeOverlay(){
         octx.mozImageSmoothingEnabled = false;
         octx.imageSmoothingEnabled = false;
 
-        octx.drawImage(overlayImage,0,0,reWidth,reHeight);
-        octx.drawImage(overlayCanvas,0,0,reWidth,reHeight,0,0,canvas.width,canvas.height);
+        octx.drawImage(overlayImage, 0, 0, reWidth, reHeight);
+        octx.drawImage(overlayCanvas, 0, 0, reWidth, reHeight, 0, 0, canvas.width, canvas.height);
     }
+}
+
+function mapRange(num, in_min, in_max, out_min, out_max) {
+    return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
