@@ -28,11 +28,25 @@ let outputSliderForm = document.getElementById("output-slider-form");
 let downloadForm = document.getElementById("download-form");
 let downloadButton = document.getElementById("download-button");
 
+let outputQualityReductionText = document.getElementById("output-quality-text");
 let outputQualityReduction = document.getElementById("output-quality-reduction");
+
+let outputProgressBar = document.getElementById("output-progress")
 
 let baseImage;
 let overlayImage;
 let qrStrength = 16;
+
+const gpu = new GPU();
+// const multiplyMatrix = gpu.createKernel(function(a, b) {
+//     let sum = 0;
+//     for (let i = 0; i < 512; i++) {
+//         sum += a[this.thread.y][i] * b[i][this.thread.x];
+//     }
+//     return sum;
+// }).setOutput([512, 512]);
+
+//const c = multiplyMatrix(1, 2);
 
 baseImageUpload.addEventListener("change", (e) => {
 
@@ -124,6 +138,7 @@ maxROutputRadio.addEventListener("change", (e) => {
 
         outputSliderForm.hidden = true;
 
+        outputQualityReductionText.hidden = false;
         outputQualityReduction.innerText = "1";
 
         outputButton.hidden = false;
@@ -137,6 +152,7 @@ compOutputRadio.addEventListener("change", (e) => {
 
         outputSliderForm.hidden = true;
 
+        outputQualityReductionText.hidden = false;
         outputQualityReduction.innerText = "4";
 
         outputButton.hidden = false;
@@ -151,6 +167,7 @@ customOutputRadio.addEventListener("change", (e) => {
 
         outputSliderForm.hidden = false;
 
+        outputQualityReductionText.hidden = false;
         outputQualityReduction.innerText = outputSlider.value;
 
         outputButton.hidden = false;
@@ -237,30 +254,58 @@ function encode() {
 
     let outputData = new ImageData(canvas.width, canvas.height);
 
-    for (let i = 0; i < overlayData.data.length; i += 4) {
+    const gpuEncode = gpu.createKernel(function (base, overlay) {
 
-        const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
-        const oPixel = [overlayData.data[i], overlayData.data[i + 1], overlayData.data[i + 2], overlayData.data[i + 3]];
+        const pos = 4 * (this.thread.x + this.constants.w * (this.constants.h - this.thread.y));
+        const bPixel = [base[pos],base[pos + 1],base[pos + 2]];
+        const oPixel = [overlay[pos],overlay[pos + 1],overlay[pos + 2]];
 
-        for (let color = 0; color < pixel.length; color++) {
-            if (color < 3) {
-                //round base pixels down to a multiple of qr
-                let base = Math.floor(pixel[color] / qr) * qr;
+        const opPixel = [
+            Math.min((Math.floor(bPixel[0] / (this.constants.oqr*this.constants.qrs)) * (this.constants.oqr*this.constants.qrs)) + ((Math.floor(oPixel[0] / this.constants.qrs)) * this.constants.oqr), 255),
+            Math.min((Math.floor(bPixel[1] / (this.constants.oqr*this.constants.qrs)) * (this.constants.oqr*this.constants.qrs)) + ((Math.floor(oPixel[1] / this.constants.qrs)) * this.constants.oqr), 255),
+            Math.min((Math.floor(bPixel[2] / (this.constants.oqr*this.constants.qrs)) * (this.constants.oqr*this.constants.qrs)) + ((Math.floor(oPixel[2] / this.constants.qrs)) * this.constants.oqr), 255),
+        ];
 
-                //round overlay pixels to 16 color values for r,g,b
-                let overlay = (Math.floor(oPixel[color] / qrStrength)) * Number(outputQualityReduction.innerText);
+        this.color(opPixel[0]/256, opPixel[1]/256, opPixel[2]/256, 1);
+    })
+        .setOutput([canvas.width, canvas.height])
+        .setConstants({ w: canvas.width, h: canvas.height, oqr: Number(outputQualityReduction.innerText) ,qrs: qrStrength })
+        .setGraphical(true);
 
-                //in the output, append the overlay to the base
-                outputData.data[i + color] = Math.min(base + overlay, 255);
-            } else {
+    // for (let i = 0; i < overlayData.data.length; i += 4) {
 
-                //do nothing to the alpha channel
-                outputData.data[i + color] = pixel[color];
-            }
-        }
-    }
+    //     progress(Math.round((i/baseData.data.length)*100));
 
+    //     const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
+    //     const oPixel = [overlayData.data[i], overlayData.data[i + 1], overlayData.data[i + 2], overlayData.data[i + 3]];
+
+    //     for (let color = 0; color < pixel.length; color++) {
+    //         if (color < 3) {
+    //             //round base pixels down to a multiple of qr
+    //             let base = Math.floor(pixel[color] / qr) * qr;
+
+    //             //round overlay pixels to 16 color values for r,g,b
+    //             let overlay = (Math.floor(oPixel[color] / qrStrength)) * Number(outputQualityReduction.innerText);
+
+    //             //in the output, append the overlay to the base
+    //             outputData.data[i + color] = Math.min(base + overlay, 255);
+    //         } else {
+
+    //             //do nothing to the alpha channel
+    //             outputData.data[i + color] = pixel[color];
+    //         }
+    //     }
+    // }
+
+    gpuEncode(baseData.data, overlayData.data);
+
+    //console.log(gpuEncode.getPixels());
+    //console.log(outputData.data);
+    outputData.data.set(gpuEncode.getPixels());
     opctx.putImageData(outputData, 0, 0);
+
+    //outputImage = gpuEncode.canvas;
+    //opctx.drawImage(outputImage, 0, 0);
 
 }
 
@@ -277,27 +322,56 @@ function decode() {
 
     let outputData = new ImageData(canvas.width, canvas.height);
 
-    for (let i = 0; i < baseData.data.length; i += 4) {
+    const gpuDecode = gpu.createKernel(function (base) {
 
-        const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
+        const pos = 4 * (this.thread.x + this.constants.w * (this.constants.h - this.thread.y));
+        const bPixel = [base[pos],base[pos + 1],base[pos + 2]];
 
-        for (let color = 0; color < pixel.length; color++) {
-            if (color < 3) {
-                //get the 16  r,g,b, from the base and ensure max is qrStrength to make them fit range
-                let output = Math.floor(((pixel[color] % qr))/Number(outputQualityReduction.innerText)) * qrStrength;
+        const opPixel = [
+            Math.min((Math.floor(((bPixel[0] % (this.constants.oqr*this.constants.qrs))) / this.constants.oqr) * this.constants.qrs), 255),
+            Math.min((Math.floor(((bPixel[1] % (this.constants.oqr*this.constants.qrs))) / this.constants.oqr) * this.constants.qrs), 255),
+            Math.min((Math.floor(((bPixel[2] % (this.constants.oqr*this.constants.qrs))) / this.constants.oqr) * this.constants.qrs), 255),
+        ];
 
-                //in the output, append the overlay to the base
-                outputData.data[i + color] = Math.min(output, 255);
-            } else {
+        this.color(opPixel[0]/256, opPixel[1]/256, opPixel[2]/256, 1);
+    })
+        .setOutput([canvas.width, canvas.height])
+        .setConstants({ w: canvas.width, h: canvas.height, oqr: Number(outputQualityReduction.innerText) ,qrs: qrStrength })
+        .setGraphical(true);
 
-                //do nothing to the alpha channel
-                outputData.data[i + color] = pixel[color];
-            }
-        }
+    // for (let i = 0; i < baseData.data.length; i += 4) {
 
-    }
+    //     progress(Math.round((i / baseData.data.length) * 100));
 
+    //     const pixel = [baseData.data[i], baseData.data[i + 1], baseData.data[i + 2], baseData.data[i + 3]];
+
+    //     for (let color = 0; color < pixel.length; color++) {
+    //         if (color < 3) {
+    //             //get the 16  r,g,b, from the base and ensure max is qrStrength to make them fit range
+    //             let output = Math.floor(((pixel[color] % qr)) / Number(outputQualityReduction.innerText)) * qrStrength;
+
+    //             //in the output, append the overlay to the base
+    //             outputData.data[i + color] = Math.min(output, 255);
+    //         } else {
+
+    //             //do nothing to the alpha channel
+    //             outputData.data[i + color] = pixel[color];
+    //         }
+    //     }
+
+    // }
+
+    gpuDecode(baseData.data);
+
+    //opctx.putImageData(outputData, 0, 0);
+
+    outputData.data.set(gpuDecode.getPixels());
     opctx.putImageData(outputData, 0, 0);
+}
+
+function progress(percent) {
+    outputProgressBar.innerText = percent;
+    outputProgressBar.style.width = percent;
 }
 
 function resizeOverlay() {

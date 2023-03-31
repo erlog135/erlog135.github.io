@@ -3,12 +3,19 @@
     src: url(Brash.ttf);
 }
 
+html{
+    min-height: 100%;
+}
 
 body.not-bs-body{
     background-color: #001E2F;
     background-image: url("t1.svg"),linear-gradient(to bottom right,#001e2f,#37003A,#1f1c00);
     background-position: center;
     background-repeat: repeat;
+}
+
+body.ps-body{
+    min-height: 100%;
 }
 
 .brash-font{
@@ -72,12 +79,12 @@ body.not-bs-body{
     
 }
 
-.card{
+.main-site .card{
     transition:  0.2s cubic-bezier(0.455, 0.03, 0.515, 0.955);
     transition-property: transform, border;
 }
 
-.card:hover{
+.main-site .card:hover{
     transform: scale(1.05);
 }
 
@@ -159,5 +166,16 @@ body.not-bs-body{
         translateY(calc((100% - var(--y) * var(--shift-px)) / 90));
     scale: 1.05;
 
+}
+
+.ps-img{
+    width: 72px;
+    height: 72px;
+    image-rendering: pixelated;
+}
+
+.ps-cvs{
+    max-width: 50%;
+    image-rendering: pixelated;
 }
 
