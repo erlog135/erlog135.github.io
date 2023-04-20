@@ -95,7 +95,7 @@
                     <label class="form-check-label" for="output-custom">Output custom</label>
                     <input class="form-check-input" id="output-custom" type="radio" name="output-quality" />
 
-                    <div id="output-slider-form" hidden>
+                    <div id="output-slider-form" class="mt-4" hidden>
                         <label class="form-label" for="output-slider">Quality reduction:</label>
                         <input class="form-range" type="range" min="1" max="8" value="4" class="slider" id="output-slider"/>
                     </div>
@@ -106,6 +106,10 @@
                     <p>Quality reduction:
                         <h1><span class="badge bg-light text-dark" id="output-quality-reduction">4</span></h1>
                     </p>
+
+                    <div class="alert alert-dark bg-dark text-light" role="alert">
+                        A higher quality reduction value means the output's encoded image is more likely to survive image compression.
+                    </div>
                 </div>
 
                 <button class="btn btn-light text-dark mb-3" id="output-button" hidden>Encode</button>

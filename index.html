@@ -46,9 +46,37 @@
         </h1>
       </div>
 
-      <div id="carouselExampleControls" class="carousel parallax-wrap slide outline-special" data-bs-ride="carousel">
+      <div id="carouselSpotlight" class="carousel parallax-wrap slide outline-special" data-bs-interval="false" data-bs-ride="carousel" data-bs-pause="hover">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselSpotlight" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselSpotlight" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselSpotlight" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
         <div class="carousel-inner">
+
           <div class="carousel-item active">
+
+            <div class="d-none d-md-block">
+              <img src="images/FontDemo4-01.png" class="parallax-target" style="--shift:1;" alt="...">
+            </div>
+
+            <div class="carousel-inner-overlay"></div>
+
+            <img src="images/FontDemo4-01.png" class="d-block w-100" alt="...">
+
+
+            <div class="carousel-caption">
+              <h5 class="shadow-dark">Leyzux Bold & Leyzux Brash (V1)</h5>
+              <p class="shadow-dark">A cohesive unicase and monospaced font duo</p>
+              
+              <a role="button" class="btn text-dark btn-sm btn-light border border-0 m-2" href="downloads/fonts/BrashV1.ttf" download>Download Leyzux Brash</a>
+              <a role="button" class="btn text-dark btn-sm btn-light border border-0 m-2" href="downloads/fonts/BoldV1.ttf" download>Download Leyzux Bold</a>
+              <a role="button" class="btn text-dark btn-sm btn-light border border-0 m-2" href="downloads/fonts/LeyzuxV1.ttc" download>Download Collection</a>
+            </div>
+
+          </div>
+
+          <div class="carousel-item">
 
             <div class="d-none d-md-block">
               <img src="images/room-inner.png" class="parallax-target" style="--shift:2;" alt="...">
@@ -62,13 +90,15 @@
 
 
             <div class="carousel-caption">
-              <h5>The Aquarians</h5>
-              <p>Point-and-click prequel to Aquarius</p>
-              <button type="button" class="btn text-light btn-sm btn-special border border-0" disabled>Still in
+              <h5 class="shadow-dark">The Aquarians</h5>
+              <p class="shadow-dark">Point-and-click prequel to Aquarius</p>
+              <button type="button" class="btn text-dark btn-sm btn-light border border-0 m-2" disabled>Still in
                 progress!</button>
             </div>
 
           </div>
+
+          
 
           <div class="carousel-item">
 
@@ -86,21 +116,21 @@
 
 
             <div class="carousel-caption">
-              <h5>Aquarius</h5>
-              <p>Underwater sandbox/adventure game built with the Godot game engine</p>
-              <button type="button" class="btn text-light btn-sm btn-special border border-0" disabled>Still in
+              <h5 class="shadow-dark">Aquarius</h5>
+              <p class="shadow-dark">Underwater sandbox/adventure game built with the Godot game engine</p>
+              <button type="button" class="btn text-dark btn-sm btn-light border border-0 m-2" disabled>Still in
                 progress!</button>
             </div>
 
           </div>
 
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSpotlight"
           data-bs-slide="prev">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselSpotlight"
           data-bs-slide="next">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="visually-hidden">Next</span>

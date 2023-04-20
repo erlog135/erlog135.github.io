@@ -1,6 +1,6 @@
 @font-face {
     font-family: brashV1;
-    src: url(Brash.ttf);
+    src: url(BrashV1.ttf);
 }
 
 html{
@@ -30,8 +30,16 @@ body.ps-body{
 
 }
 
+.carousel-control-next-icon{
+    filter: drop-shadow(0 0 3px black);
+}
+
+.carousel-control-prev-icon{
+    filter: drop-shadow(0 0 3px black);
+}
+
 .btn-special{
-    background: linear-gradient(to bottom right,#52b4f3,#f23cf7,#f23cf7,#fbf424);
+    background: linear-gradient(to bottom right,#52b4f3,#f23cf7,#a728ab,#a728ab,#a728ab,#f23cf7,#fbf424);
 }
 
 .carousel-item{
@@ -61,7 +69,7 @@ body.ps-body{
     position: absolute;
     left: 0px;
     top: 0px;
-    background: linear-gradient(to bottom,#ffffff00,#ffffff00,#000000aa);
+    background: linear-gradient(to bottom,#00000000,#00000000,#000000bb);
 }
 
 .card .card-img-overlay{
