@@ -23,6 +23,11 @@ body.ps-body{
     overflow-x: hidden;
 }
 
+.brash-font a{
+    color: white;
+    text-decoration: none;
+}
+
 .outline-special{
     background: linear-gradient(to bottom right,#fbf424,#52b4f3,#f23cf7);
     border-radius: .25rem;
