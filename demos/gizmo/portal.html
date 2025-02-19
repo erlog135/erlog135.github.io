@@ -106,7 +106,8 @@
         .floating-line {
             position: absolute;
             width: 100%;
-            height: 5px;
+            height: 8px;
+            border-radius: 4px;
             background-color: white;
             transform-origin: left;
             animation: float-motion 3s infinite ease-in-out alternate;
@@ -163,16 +164,16 @@
                 return;
             }
 
-            button.setAttribute("disabled","");
-            button.innerText = "Checking..."
-            fetch(input.value).then((response) => {
-                //alert("OK"+response.ok);
-                window.location.href = input.value;
-            }).catch((error) => {
-                //alert("NO"+error);
-                button.removeAttribute("disabled");
-                button.innerText = "Connect"
-            })
+            window.location.href = input.value;
+
+            // button.setAttribute("disabled","");
+            // button.innerText = "Checking..."
+            // fetch(input.value).then((response) => {
+            //     window.location.href = input.value;
+            // }).catch((error) => {
+            //     button.removeAttribute("disabled");
+            //     button.innerText = "Connect"
+            // })
         }
 
     </script>
